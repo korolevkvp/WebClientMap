@@ -2,9 +2,9 @@ package com.korolev_kvp.webservice.service;
 
 import org.springframework.stereotype.Service;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,7 +12,9 @@ import java.util.Map;
 public class MessageService {
 
     // Хранилище данных
-    private static final Map<String, String> MESSAGE_REPOSITORY_MAP = new HashMap<>();
+    private static Map<String, String> MESSAGE_REPOSITORY_MAP = new HashMap<>();
+
+    private final String fileName = "data.json";
 
     /**
      * Обновляет данные с заданным ключом,
@@ -67,6 +69,29 @@ public class MessageService {
      * @return - true - запись удалась, иначе false
      */
     public boolean dump(String fileName) {
+        return dumpFromFile(fileName);
+
+    }
+
+    /**
+     * Сохраняет текущее состояние хранилища
+     * и записывает его в файл по умолчанию
+     *
+     * @return - true - запись удалась, иначе false
+     */
+    public boolean dump() {
+        return dumpFromFile(fileName);
+
+    }
+
+    /**
+     * Вспомогательный метод для сохранения
+     * текущего состояния хранилища
+     * и записи его в файл
+     *
+     * @return - true - запись удалась, иначе false
+     */
+    private boolean dumpFromFile(String fileName) {
         try (OutputStream outputStream = new FileOutputStream(fileName)) {
             final Map<String, String> dataList = getAll();
             byte[] dataToBytes = mapToString(dataList).getBytes();
@@ -75,7 +100,45 @@ public class MessageService {
         } catch (IOException e) {
             return false;
         }
+    }
 
+
+    /**
+     * Загружает текущее состояние хранилища
+     * из файла
+     *
+     * @param fileName - имя файла
+     * @return - true - загрузка удалась, иначе false
+     */
+    public boolean load(String fileName) {
+        return loadFromFile(fileName);
+    }
+
+    /**
+     * Загружает текущее состояние хранилища
+     * из файла по умолчанию
+     *
+     * @return - true - загрузка удалась, иначе false
+     */
+    public boolean load() {
+        return loadFromFile(fileName);
+    }
+
+    /**
+     * Вспомогательный метод для преобразования для
+     * загрузки текущее состояние хранилища из файла
+     *
+     * @return - true - загрузка удалась, иначе false
+     */
+    private boolean loadFromFile(String fileName) {
+        try {
+            String content = Files.lines(Paths.get(fileName)).reduce("", String::concat);
+            MESSAGE_REPOSITORY_MAP = stringToMap(content);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     /**
@@ -91,11 +154,41 @@ public class MessageService {
             result.append("\n    \"").append(key).append("\": \"").append(map.get(key)).append("\",");
         }
         int last = result.lastIndexOf(",");
-        result.delete(last, last + 1);
+        if (last != -1) result.delete(last, last + 1);
         result.append("\n}");
         return new String(result);
     }
 
-
+    /**
+     * Вспомогательный метод для преобразования
+     * String в формате JSON в map
+     *
+     * @param str - строка с парами ключ-значение в формате JSON
+     * @return - полученный объект типа Map<String, String> (null при ошибке)
+     */
+    public Map<String, String> stringToMap(String str) throws Exception {
+        HashMap<String, String> map = new HashMap<>();
+        while (!str.equals("")) {
+            int k1 = str.indexOf("\"") + 1;
+            int k2 = k1;
+            char x = 'x';
+            while (x != '"') {
+                x = str.charAt(k2);
+                k2 += 1;
+            }
+            String key = str.substring(k1, k2 - 1);
+            k1 = k2 + 3;
+            k2 = k1;
+            x = 'x';
+            while (x != '"') {
+                x = str.charAt(k2);
+                k2 += 1;
+            }
+            String value = str.substring(k1, k2 - 1);
+            map.put(key, value);
+            str = str.substring(k2 + 1);
+        }
+        return map;
+    }
 
 }

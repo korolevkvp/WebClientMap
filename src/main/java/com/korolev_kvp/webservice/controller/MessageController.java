@@ -7,9 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Map;
 
 @RestController
@@ -27,8 +24,8 @@ public class MessageController {
     @PostMapping("{key}")
     public ResponseEntity<?> set(@PathVariable(name = "key") String key, @RequestBody String data) {
         return messageService.set(key, data)
-            ? new ResponseEntity<>("Старое значение заданного ключа изменено на новое.", HttpStatus.OK)
-            : new ResponseEntity<>("Добавлена новая пара ключ-значение.", HttpStatus.CREATED);
+                ? new ResponseEntity<>("Старое значение заданного ключа изменено на новое.", HttpStatus.OK)
+                : new ResponseEntity<>("Добавлена новая пара ключ-значение.", HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -36,7 +33,7 @@ public class MessageController {
         final Map<String, String> dataList = messageService.getAll();
         return dataList != null && !dataList.isEmpty()
                 ? new ResponseEntity<>(messageService.mapToString(dataList), HttpStatus.OK)
-                : new ResponseEntity<>("Хранилище пустое", HttpStatus.NOT_FOUND);
+                : new ResponseEntity<>("Хранилище пустое.", HttpStatus.NOT_FOUND);
     }
 
     @GetMapping(value = "{key}")
@@ -51,7 +48,7 @@ public class MessageController {
     public ResponseEntity<?> remove(@PathVariable(name = "key") String key) {
         return messageService.remove(key)
                 ? new ResponseEntity<>("Пара ключ-значение с заданным ключом успешно удалена.", HttpStatus.OK)
-                : new ResponseEntity<>("Пара ключ-значение с заданным ключом не найдена.",HttpStatus.NOT_MODIFIED);
+                : new ResponseEntity<>("Пара ключ-значение с заданным ключом не найдена.", HttpStatus.NOT_MODIFIED);
     }
 
     @GetMapping("/dump/{fileName}")
@@ -61,6 +58,25 @@ public class MessageController {
                 : new ResponseEntity<>("Произошла ошибка. Хранилище не записано в файл.", HttpStatus.NOT_FOUND);
     }
 
+    @GetMapping("/dump")
+    public ResponseEntity<?> dump() {
+        return messageService.dump()
+                ? new ResponseEntity<>("Хранилище записано и сохранено из файла по умолчанию.", HttpStatus.CREATED)
+                : new ResponseEntity<>("Произошла ошибка. Хранилище не записано в файл.", HttpStatus.NOT_FOUND);
+    }
 
+    @PostMapping("/load/{fileName}")
+    public ResponseEntity<?> load(@PathVariable String fileName) {
+        return messageService.load(fileName)
+                ? new ResponseEntity<>("Хранилище загружено из файла: " + new File(fileName), HttpStatus.OK)
+                : new ResponseEntity<>("Произошла ошибка. Хранилище не загружено из файла.", HttpStatus.NOT_FOUND);
+    }
+
+    @PostMapping("/load")
+    public ResponseEntity<?> load() {
+        return messageService.load()
+                ? new ResponseEntity<>("Хранилище загружено из файла по умолчанию.", HttpStatus.OK)
+                : new ResponseEntity<>("Произошла ошибка. Хранилище не загружено из файла.", HttpStatus.NOT_FOUND);
+    }
 
 }
