@@ -27,16 +27,16 @@ public class MessageController {
     @PostMapping("{key}")
     public ResponseEntity<?> set(@PathVariable(name = "key") String key, @RequestBody String data) {
         return messageService.set(key, data)
-            ? new ResponseEntity<>(HttpStatus.OK)
-            : new ResponseEntity<>(HttpStatus.CREATED);
+            ? new ResponseEntity<>("Старое значение заданного ключа изменено на новое.", HttpStatus.OK)
+            : new ResponseEntity<>("Добавлена новая пара ключ-значение.", HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<Map<String, String>> getAll() {
+    public ResponseEntity<String> getAll() {
         final Map<String, String> dataList = messageService.getAll();
         return dataList != null && !dataList.isEmpty()
-                ? new ResponseEntity<>(dataList, HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                ? new ResponseEntity<>(messageService.mapToString(dataList), HttpStatus.OK)
+                : new ResponseEntity<>("Хранилище пустое", HttpStatus.NOT_FOUND);
     }
 
     @GetMapping(value = "{key}")
@@ -44,21 +44,21 @@ public class MessageController {
         final String result = messageService.get(key);
         return result != null
                 ? new ResponseEntity<>(result, HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                : new ResponseEntity<>("Ключа с заданным значением нет в хранилище.", HttpStatus.NOT_FOUND);
     }
 
     @DeleteMapping(value = "{key}")
     public ResponseEntity<?> remove(@PathVariable(name = "key") String key) {
         return messageService.remove(key)
-                ? new ResponseEntity<>(HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+                ? new ResponseEntity<>("Пара ключ-значение с заданным ключом успешно удалена.", HttpStatus.OK)
+                : new ResponseEntity<>("Пара ключ-значение с заданным ключом не найдена.",HttpStatus.NOT_MODIFIED);
     }
 
     @GetMapping("/dump/{fileName}")
     public ResponseEntity<?> dump(@PathVariable String fileName) {
         return messageService.dump(fileName)
-                ? new ResponseEntity<>(new File(fileName), HttpStatus.CREATED)
-                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                ? new ResponseEntity<>("Хранилище записано и сохранено в файл: " + new File(fileName), HttpStatus.CREATED)
+                : new ResponseEntity<>("Произошла ошибка. Хранилище не записано в файл.", HttpStatus.NOT_FOUND);
     }
 
 

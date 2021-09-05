@@ -85,7 +85,7 @@ public class MessageService {
      * @param map - объект типа Map<String, String>
      * @return - получаемая строка с парами ключ-значение в формате JSON
      */
-    private String mapToString(Map<String, String> map) {
+    public String mapToString(Map<String, String> map) {
         StringBuilder result = new StringBuilder("{");
         for (String key : map.keySet()) {
             result.append("\n    \"").append(key).append("\": \"").append(map.get(key)).append("\",");
