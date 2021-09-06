@@ -16,6 +16,10 @@ public class MessageService {
 
     private final String fileName = "data.json";
 
+    public String getFileName() {
+        return fileName;
+    }
+
     /**
      * Обновляет данные с заданным ключом,
      * в соответствии с переданным клиентом,

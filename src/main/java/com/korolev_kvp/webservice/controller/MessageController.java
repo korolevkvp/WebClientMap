@@ -55,14 +55,14 @@ public class MessageController {
     @GetMapping("/dump/{fileName}")
     public ResponseEntity<?> dump(@PathVariable String fileName) {
         return messageService.dump(fileName)
-                ? new ResponseEntity<>("Хранилище записано и сохранено в файл: " + new File(fileName), HttpStatus.CREATED)
+                ? new ResponseEntity<>(new File(fileName), HttpStatus.CREATED)
                 : new ResponseEntity<>("Произошла ошибка. Хранилище не записано в файл.", HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("/dump")
     public ResponseEntity<?> dump() {
         return messageService.dump()
-                ? new ResponseEntity<>("Хранилище записано и сохранено из файла по умолчанию.", HttpStatus.CREATED)
+                ? new ResponseEntity<>(new File(messageService.getFileName()), HttpStatus.CREATED)
                 : new ResponseEntity<>("Произошла ошибка. Хранилище не записано в файл.", HttpStatus.NOT_FOUND);
     }
 
