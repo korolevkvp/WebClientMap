@@ -2,22 +2,72 @@ package com.korolev_kvp.webservice.service;
 
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class MessageService {
 
     // Хранилище данных
     private static Map<String, String> MESSAGE_REPOSITORY_MAP = new HashMap<>();
-
     private final String fileName = "data.json";
 
     public String getFileName() {
         return fileName;
+    }
+
+    private static final Map<String, Integer> timeMap = new ConcurrentHashMap<>();
+
+    private static final Thread timeThread;
+
+    // поток для счёта времени и удаления просроченных данных
+    static {
+        timeThread = new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                for (String key:
+                        timeMap.keySet()) {
+                    timeMap.put(key, timeMap.get(key) - 1);
+                    if (timeMap.get(key) == 0) {
+                        timeMap.remove(key);
+                        MESSAGE_REPOSITORY_MAP.remove(key);
+                        System.out.println("Данные по ключу \"" + key + "\" удалены из таблицы.");
+
+                    }
+                }
+
+            }
+        });
+        MessageService.timeThread.start();
+    }
+
+
+    /**
+     * Обновляет данные с заданным ключом,
+     * в соответствии с переданным клиентом,
+     * если такой уже имеется.
+     * Иначе создает новые данные.
+     * По умолчанию параметр ttl устанавливается в 100 секунд.
+     *
+     * @param key  - ключ для создания
+     * @param data - данные для создания
+     * @return создано(false) или изменено(true)
+     */
+    public boolean set(String key, String data) {
+        boolean updated = MESSAGE_REPOSITORY_MAP.containsKey(key);
+        MESSAGE_REPOSITORY_MAP.put(key, data);
+        timeMap.put(key, 100);
+        return updated;
     }
 
     /**
@@ -28,11 +78,13 @@ public class MessageService {
      *
      * @param key  - ключ для создания
      * @param data - данные для создания
+     * @param ttl - время жизни записи
      * @return создано(false) или изменено(true)
      */
-    public boolean set(String key, String data) {
+    public boolean set(String key, String data, int ttl) {
         boolean updated = MESSAGE_REPOSITORY_MAP.containsKey(key);
         MESSAGE_REPOSITORY_MAP.put(key, data);
+        timeMap.put(key, ttl);
         return updated;
     }
 
@@ -173,24 +225,24 @@ public class MessageService {
     public Map<String, String> stringToMap(String str) throws Exception {
         HashMap<String, String> map = new HashMap<>();
         while (!str.equals("")) {
-            int k1 = str.indexOf("\"") + 1;
-            int k2 = k1;
-            char x = 'x';
-            while (x != '"') {
-                x = str.charAt(k2);
-                k2 += 1;
+            int startChar = str.indexOf("\"") + 1;
+            int endChar = startChar;
+            char currentChar = 'x';
+            while (currentChar != '"') {
+                currentChar = str.charAt(endChar);
+                endChar += 1;
             }
-            String key = str.substring(k1, k2 - 1);
-            k1 = k2 + 3;
-            k2 = k1;
-            x = 'x';
-            while (x != '"') {
-                x = str.charAt(k2);
-                k2 += 1;
+            String key = str.substring(startChar, endChar - 1);
+            startChar = endChar + 3;
+            endChar = startChar;
+            currentChar = 'x';
+            while (currentChar != '"') {
+                currentChar = str.charAt(endChar);
+                endChar += 1;
             }
-            String value = str.substring(k1, k2 - 1);
+            String value = str.substring(startChar, endChar - 1);
             map.put(key, value);
-            str = str.substring(k2 + 1);
+            str = str.substring(endChar + 1);
         }
         return map;
     }

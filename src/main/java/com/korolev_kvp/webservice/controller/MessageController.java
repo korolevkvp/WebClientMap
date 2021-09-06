@@ -21,14 +21,21 @@ public class MessageController {
     }
 
 
-    @PostMapping("{key}")
+    @PostMapping("/set/{key}")
     public ResponseEntity<?> set(@PathVariable(name = "key") String key, @RequestBody String data) {
         return messageService.set(key, data)
                 ? new ResponseEntity<>("Старое значение заданного ключа изменено на новое.", HttpStatus.OK)
                 : new ResponseEntity<>("Добавлена новая пара ключ-значение.", HttpStatus.CREATED);
     }
 
-    @GetMapping
+    @PostMapping("/set/{key}/{ttl}")
+    public ResponseEntity<?> set(@PathVariable(name = "key") String key, @RequestBody String data,  @PathVariable String ttl) {
+        return messageService.set(key, data, Integer.parseInt(ttl))
+                ? new ResponseEntity<>("Старое значение заданного ключа изменено на новое.", HttpStatus.OK)
+                : new ResponseEntity<>("Добавлена новая пара ключ-значение.", HttpStatus.CREATED);
+    }
+
+    @GetMapping("/get")
     public ResponseEntity<String> getAll() {
         final Map<String, String> dataList = messageService.getAll();
         return dataList != null && !dataList.isEmpty()
@@ -36,7 +43,7 @@ public class MessageController {
                 : new ResponseEntity<>("Хранилище пустое.", HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping(value = "{key}")
+    @GetMapping(value = "/get/{key}")
     public ResponseEntity<String> get(@PathVariable(name = "key") String key) {
         final String result = messageService.get(key);
         return result != null
