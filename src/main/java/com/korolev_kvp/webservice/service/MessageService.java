@@ -57,34 +57,42 @@ public class MessageService {
      * в соответствии с переданным клиентом,
      * если такой уже имеется.
      * Иначе создает новые данные.
-     * По умолчанию параметр ttl устанавливается в 100 секунд.
+     * Время жизни записи устанавливается в 100 секунд.
      *
      * @param key  - ключ для создания
      * @param data - данные для создания
-     * @return создано(false) или изменено(true)
+     * @return false если созданы новые данные, true если старые данные обновлены
      */
     public boolean set(String key, String data) {
-        boolean updated = MESSAGE_REPOSITORY_MAP.containsKey(key);
-        MESSAGE_REPOSITORY_MAP.put(key, data);
-        timeMap.put(key, 100);
-        return updated;
+        return setElement(key, data, 100);
     }
 
     /**
      * Обновляет данные с заданным ключом,
      * в соответствии с переданным клиентом,
      * если такой уже имеется.
-     * Иначе создает новые данные
+     * Иначе создает новые данные.
+     * Устанавливается передаваемое время жизни записи.
      *
      * @param key  - ключ для создания
      * @param data - данные для создания
      * @param ttl - время жизни записи
-     * @return создано(false) или изменено(true)
+     * @return false если созданы новые данные, true если старые данные обновлены
      */
     public boolean set(String key, String data, int ttl) {
+        return setElement(key, data, ttl);
+    }
+
+    /**
+     * Вспомогательный метод для добавления
+     * новых данных в хранилище.
+     *
+     * @return - true - запись удалась, иначе false
+     */
+    private boolean setElement(String key, String data, int i) {
         boolean updated = MESSAGE_REPOSITORY_MAP.containsKey(key);
         MESSAGE_REPOSITORY_MAP.put(key, data);
-        timeMap.put(key, ttl);
+        timeMap.put(key, i);
         return updated;
     }
 
@@ -122,7 +130,7 @@ public class MessageService {
      * и записывает его в файл
      *
      * @param fileName - имя файла
-     * @return - true - запись удалась, иначе false
+     * @return - true если запись удалась, иначе false
      */
     public boolean dump(String fileName) {
         return dumpFromFile(fileName);
@@ -133,7 +141,7 @@ public class MessageService {
      * Сохраняет текущее состояние хранилища
      * и записывает его в файл по умолчанию
      *
-     * @return - true - запись удалась, иначе false
+     * @return - true если запись удалась, иначе false
      */
     public boolean dump() {
         return dumpFromFile(fileName);
@@ -145,7 +153,7 @@ public class MessageService {
      * текущего состояния хранилища
      * и записи его в файл
      *
-     * @return - true - запись удалась, иначе false
+     * @return - true если запись удалась, иначе false
      */
     private boolean dumpFromFile(String fileName) {
         try (OutputStream outputStream = new FileOutputStream(fileName)) {
@@ -164,7 +172,7 @@ public class MessageService {
      * из файла
      *
      * @param fileName - имя файла
-     * @return - true - загрузка удалась, иначе false
+     * @return - true если загрузка удалась, иначе false
      */
     public boolean load(String fileName) {
         return loadFromFile(fileName);
@@ -174,7 +182,7 @@ public class MessageService {
      * Загружает текущее состояние хранилища
      * из файла по умолчанию
      *
-     * @return - true - загрузка удалась, иначе false
+     * @return - true если загрузка удалась, иначе false
      */
     public boolean load() {
         return loadFromFile(fileName);
@@ -184,7 +192,7 @@ public class MessageService {
      * Вспомогательный метод для преобразования для
      * загрузки текущее состояние хранилища из файла
      *
-     * @return - true - загрузка удалась, иначе false
+     * @return - true если загрузка удалась, иначе false
      */
     private boolean loadFromFile(String fileName) {
         try {
