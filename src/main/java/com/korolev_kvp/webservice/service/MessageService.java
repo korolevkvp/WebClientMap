@@ -57,8 +57,8 @@ public class MessageService {
      * @param key - ключ клиента, которого нужно удалить
      * @return - true если клиент был удален, иначе false
      */
-    public boolean remove(String key) {
-        return MESSAGE_REPOSITORY_MAP.remove(key) != null;
+    public String remove(String key) {
+        return MESSAGE_REPOSITORY_MAP.remove(key);
     }
 
     /**

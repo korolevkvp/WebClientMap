@@ -45,9 +45,10 @@ public class MessageController {
     }
 
     @DeleteMapping(value = "{key}")
-    public ResponseEntity<?> remove(@PathVariable(name = "key") String key) {
-        return messageService.remove(key)
-                ? new ResponseEntity<>("Пара ключ-значение с заданным ключом успешно удалена.", HttpStatus.OK)
+    public ResponseEntity<String> remove(@PathVariable(name = "key") String key) {
+        String result = messageService.remove(key);
+        return result != null
+                ? new ResponseEntity<>(result, HttpStatus.OK)
                 : new ResponseEntity<>("Пара ключ-значение с заданным ключом не найдена.", HttpStatus.NOT_MODIFIED);
     }
 
