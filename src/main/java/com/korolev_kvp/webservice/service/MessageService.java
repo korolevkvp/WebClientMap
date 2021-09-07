@@ -89,10 +89,10 @@ public class MessageService {
      *
      * @return - true - запись удалась, иначе false
      */
-    private boolean setElement(String key, String data, int i) {
+    private boolean setElement(String key, String data, int ttl) {
         boolean updated = MESSAGE_REPOSITORY_MAP.containsKey(key);
         MESSAGE_REPOSITORY_MAP.put(key, data);
-        timeMap.put(key, i);
+        timeMap.put(key, ttl);
         return updated;
     }
 
