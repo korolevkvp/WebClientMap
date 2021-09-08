@@ -12,10 +12,15 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-public class MessageService {
+public class DataBaseService {
 
     // Хранилище данных
-    private static Map<String, String> MESSAGE_REPOSITORY_MAP = new HashMap<>();
+    private static Map<String, String> DATA_BASE_MAP = new HashMap<>();
+
+    public static Map<String, String> getDataBaseMap() {
+        return DATA_BASE_MAP;
+    }
+
     private final String fileName = "data.json";
 
     public String getFileName() {
@@ -40,7 +45,7 @@ public class MessageService {
                     timeMap.put(key, timeMap.get(key) - 1);
                     if (timeMap.get(key) == 0) {
                         timeMap.remove(key);
-                        MESSAGE_REPOSITORY_MAP.remove(key);
+                        DATA_BASE_MAP.remove(key);
                         System.out.println("Данные по ключу \"" + key + "\" удалены из таблицы.");
 
                     }
@@ -48,7 +53,7 @@ public class MessageService {
 
             }
         });
-        MessageService.timeThread.start();
+        DataBaseService.timeThread.start();
     }
 
 
@@ -90,8 +95,8 @@ public class MessageService {
      * @return - true - запись удалась, иначе false
      */
     private boolean setElement(String key, String data, int ttl) {
-        boolean updated = MESSAGE_REPOSITORY_MAP.containsKey(key);
-        MESSAGE_REPOSITORY_MAP.put(key, data);
+        boolean updated = DATA_BASE_MAP.containsKey(key);
+        DATA_BASE_MAP.put(key, data);
         timeMap.put(key, ttl);
         return updated;
     }
@@ -102,7 +107,7 @@ public class MessageService {
      * @return список данных
      */
     public Map<String, String> getAll() {
-        return MESSAGE_REPOSITORY_MAP;
+        return DATA_BASE_MAP;
     }
 
     /**
@@ -112,7 +117,7 @@ public class MessageService {
      * @return - объект клиента с заданным ключом
      */
     public String get(String key) {
-        return MESSAGE_REPOSITORY_MAP.get(key);
+        return DATA_BASE_MAP.get(key);
     }
 
     /**
@@ -122,7 +127,7 @@ public class MessageService {
      * @return - true если клиент был удален, иначе false
      */
     public String remove(String key) {
-        return MESSAGE_REPOSITORY_MAP.remove(key);
+        return DATA_BASE_MAP.remove(key);
     }
 
     /**
@@ -197,7 +202,7 @@ public class MessageService {
     private boolean loadFromFile(String fileName) {
         try {
             String content = Files.lines(Paths.get(fileName)).reduce("", String::concat);
-            MESSAGE_REPOSITORY_MAP = stringToMap(content);
+            DATA_BASE_MAP = stringToMap(content);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
