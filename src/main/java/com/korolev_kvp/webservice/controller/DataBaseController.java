@@ -30,9 +30,13 @@ public class DataBaseController {
 
     @PostMapping("/set/{key}/{ttl}")
     public ResponseEntity<?> set(@PathVariable(name = "key") String key, @RequestBody String data,  @PathVariable String ttl) {
-        return dataBaseService.set(key, data, Integer.parseInt(ttl))
-                ? new ResponseEntity<>("Старое значение заданного ключа изменено на новое.", HttpStatus.OK)
-                : new ResponseEntity<>("Добавлена новая пара ключ-значение.", HttpStatus.CREATED);
+        try {
+            return dataBaseService.set(key, data, ttl)
+                    ? new ResponseEntity<>("Старое значение заданного ключа изменено на новое.", HttpStatus.OK)
+                    : new ResponseEntity<>("Добавлена новая пара ключ-значение.", HttpStatus.CREATED);
+        } catch (NumberFormatException e) {
+            return new ResponseEntity<>("Ошибка. В качестве времени жизни передано не число.", HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/get")

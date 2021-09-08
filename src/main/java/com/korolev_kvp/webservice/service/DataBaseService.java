@@ -27,7 +27,7 @@ public class DataBaseService {
         return fileName;
     }
 
-    private static final Map<String, Integer> timeMap = new ConcurrentHashMap<>();
+    private static final Map<String, Double> timeMap = new ConcurrentHashMap<>();
 
     private static final Thread timeThread;
 
@@ -43,7 +43,7 @@ public class DataBaseService {
                 for (String key:
                         timeMap.keySet()) {
                     timeMap.put(key, timeMap.get(key) - 1);
-                    if (timeMap.get(key) == 0) {
+                    if (timeMap.get(key) <= 0) {
                         timeMap.remove(key);
                         DATA_BASE_MAP.remove(key);
                         System.out.println("Данные по ключу \"" + key + "\" удалены из таблицы.");
@@ -69,7 +69,7 @@ public class DataBaseService {
      * @return false если созданы новые данные, true если старые данные обновлены
      */
     public boolean set(String key, String data) {
-        return setElement(key, data, 100);
+        return setElement(key, data, 100.);
     }
 
     /**
@@ -84,8 +84,8 @@ public class DataBaseService {
      * @param ttl - время жизни записи
      * @return false если созданы новые данные, true если старые данные обновлены
      */
-    public boolean set(String key, String data, int ttl) {
-        return setElement(key, data, ttl);
+    public boolean set(String key, String data, String ttl) throws NumberFormatException{
+        return setElement(key, data, Double.parseDouble(ttl));
     }
 
     /**
@@ -94,7 +94,7 @@ public class DataBaseService {
      *
      * @return - true - запись удалась, иначе false
      */
-    private boolean setElement(String key, String data, int ttl) {
+    private boolean setElement(String key, String data, Double ttl) {
         boolean updated = DATA_BASE_MAP.containsKey(key);
         DATA_BASE_MAP.put(key, data);
         timeMap.put(key, ttl);

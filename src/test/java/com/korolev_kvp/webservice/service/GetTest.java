@@ -2,7 +2,9 @@ package com.korolev_kvp.webservice.service;
 
 import org.junit.jupiter.api.*;
 
-class SetTest {
+import java.util.HashMap;
+
+class GetTest {
 
     private DataBaseService dataBaseService;
 
@@ -11,17 +13,18 @@ class SetTest {
 
     @BeforeAll
     public static void beforeClass() {
-        System.out.println("До SetTest класса");
+        System.out.println("До GetTest класса");
     }
 
     @AfterAll
     public  static void afterClass() {
-        System.out.println("После SetTest класса");
+        System.out.println("После GetTest класса");
     }
 
     @BeforeEach
     public void initTest() {
         dataBaseService = new DataBaseService();
+        dataBaseService.set(key, value);
     }
 
     @AfterEach
@@ -30,17 +33,17 @@ class SetTest {
     }
 
     @Test
-    void testValue() {
-        dataBaseService.set(key, value);
+    void testDefaultGet() {
         Assertions.assertEquals(value, dataBaseService.get(key));
     }
 
     @Test
-    void testKey() {
-        dataBaseService.set(key, value);
-        Assertions.assertTrue(DataBaseService.getDataBaseMap().containsKey(key));
+    void testGetEmpty() {
+        Assertions.assertNull(dataBaseService.get(""));
     }
 
-
-
+    @Test
+    void testGetAll() {
+        Assertions.assertEquals(new HashMap<>() {{put(key, value);}}, dataBaseService.getAll());
+    }
 }
