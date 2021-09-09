@@ -64,8 +64,8 @@ public class DataBaseService {
      * Иначе создает новые данные.
      * Время жизни записи устанавливается в 100 секунд.
      *
-     * @param key  - ключ для создания
-     * @param data - данные для создания
+     * @param key ключ для создания
+     * @param data данные для создания
      * @return false если созданы новые данные, true если старые данные обновлены
      */
     public boolean set(String key, String data) {
@@ -92,7 +92,7 @@ public class DataBaseService {
      * Вспомогательный метод для добавления
      * новых данных в хранилище.
      *
-     * @return - true - запись удалась, иначе false
+     * @return true - запись удалась, иначе false
      */
     private boolean setElement(String key, String data, Double ttl) {
         boolean updated = DATA_BASE_MAP.containsKey(key);
@@ -113,8 +113,8 @@ public class DataBaseService {
     /**
      * Возвращает клиента по его ключу
      *
-     * @param key - ключ клиента
-     * @return - объект клиента с заданным ключом
+     * @param key ключ клиента
+     * @return объект клиента с заданным ключом
      */
     public String get(String key) {
         return DATA_BASE_MAP.get(key);
@@ -123,8 +123,8 @@ public class DataBaseService {
     /**
      * Удаляет данные с заданным ключом
      *
-     * @param key - ключ клиента, которого нужно удалить
-     * @return - true если клиент был удален, иначе false
+     * @param key ключ клиента, которого нужно удалить
+     * @return бывшее значение этого ключа, или null, если пара ключ-значение не найдена
      */
     public String remove(String key) {
         return DATA_BASE_MAP.remove(key);
@@ -135,7 +135,7 @@ public class DataBaseService {
      * и записывает его в файл
      *
      * @param fileName - имя файла
-     * @return - true если запись удалась, иначе false
+     * @return true если запись удалась, иначе false
      */
     public boolean dump(String fileName) {
         return dumpFromFile(fileName);
@@ -146,7 +146,7 @@ public class DataBaseService {
      * Сохраняет текущее состояние хранилища
      * и записывает его в файл по умолчанию
      *
-     * @return - true если запись удалась, иначе false
+     * @return true если запись удалась, иначе false
      */
     public boolean dump() {
         return dumpFromFile(fileName);
@@ -158,7 +158,7 @@ public class DataBaseService {
      * текущего состояния хранилища
      * и записи его в файл
      *
-     * @return - true если запись удалась, иначе false
+     * @return true если запись удалась, иначе false
      */
     private boolean dumpFromFile(String fileName) {
         try (OutputStream outputStream = new FileOutputStream(fileName)) {
@@ -176,8 +176,8 @@ public class DataBaseService {
      * Загружает текущее состояние хранилища
      * из файла
      *
-     * @param fileName - имя файла
-     * @return - true если загрузка удалась, иначе false
+     * @param fileName имя файла
+     * @return true если загрузка удалась, иначе false
      */
     public boolean load(String fileName) {
         return loadFromFile(fileName);
@@ -187,7 +187,7 @@ public class DataBaseService {
      * Загружает текущее состояние хранилища
      * из файла по умолчанию
      *
-     * @return - true если загрузка удалась, иначе false
+     * @return true если загрузка удалась, иначе false
      */
     public boolean load() {
         return loadFromFile(fileName);
@@ -195,17 +195,22 @@ public class DataBaseService {
 
     /**
      * Вспомогательный метод для преобразования для
-     * загрузки текущее состояние хранилища из файла
+     * загрузки текущее состояние хранилища из файла.
+     * Время жизни устанавливается по умолчанию - 100 секунд.
      *
-     * @return - true если загрузка удалась, иначе false
+     * @return true если загрузка удалась, иначе false
      */
     private boolean loadFromFile(String fileName) {
         try {
             String content = Files.lines(Paths.get(fileName)).reduce("", String::concat);
             DATA_BASE_MAP = stringToMap(content);
+            for (String key :
+                    DATA_BASE_MAP.keySet()) {
+                timeMap.put(key, 100.);
+            }
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Ошибка при загрузке хранилища из файла.");
             return false;
         }
     }
@@ -214,8 +219,8 @@ public class DataBaseService {
      * Вспомогательный метод для преобразования
      * Map в String в формате JSON
      *
-     * @param map - объект типа Map<String, String>
-     * @return - получаемая строка с парами ключ-значение в формате JSON
+     * @param map объект типа Map<String, String>
+     * @return получаемая строка с парами ключ-значение в формате JSON
      */
     public String mapToString(Map<String, String> map) {
         StringBuilder result = new StringBuilder("{");
@@ -232,10 +237,10 @@ public class DataBaseService {
      * Вспомогательный метод для преобразования
      * String в формате JSON в map
      *
-     * @param str - строка с парами ключ-значение в формате JSON
-     * @return - полученный объект типа Map<String, String> (null при ошибке)
+     * @param str строка с парами ключ-значение в формате JSON
+     * @return полученный объект типа Map<String, String> (null при ошибке)
      */
-    public Map<String, String> stringToMap(String str) throws Exception {
+    public Map<String, String> stringToMap(String str) {
         HashMap<String, String> map = new HashMap<>();
         while (!str.equals("")) {
             int startChar = str.indexOf("\"") + 1;
