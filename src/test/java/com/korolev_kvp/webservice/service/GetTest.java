@@ -13,12 +13,12 @@ class GetTest {
 
     @BeforeAll
     public static void beforeClass() {
-        System.out.println("До GetTest класса");
+        System.out.println("До GetTest service класса");
     }
 
     @AfterAll
     public  static void afterClass() {
-        System.out.println("После GetTest класса");
+        System.out.println("После GetTest service класса");
     }
 
     @BeforeEach
@@ -46,4 +46,11 @@ class GetTest {
     void testGetAll() {
         Assertions.assertEquals(new HashMap<>() {{put(key, value);}}, dataBaseService.getAll());
     }
+
+    @Test
+    void testEmptyGetAll() {
+        dataBaseService.remove(key);
+        Assertions.assertEquals(new HashMap<>(), dataBaseService.getAll());
+    }
+
 }

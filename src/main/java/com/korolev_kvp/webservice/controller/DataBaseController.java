@@ -13,11 +13,11 @@ import java.util.Map;
 @RequestMapping
 public class DataBaseController {
 
-    private final DataBaseService dataBaseService;
+    private static DataBaseService dataBaseService;
 
     @Autowired
     public DataBaseController(DataBaseService dataBaseService) {
-        this.dataBaseService = dataBaseService;
+        DataBaseController.dataBaseService = dataBaseService;
     }
 
 
@@ -49,17 +49,17 @@ public class DataBaseController {
 
     @GetMapping(value = "/get/{key}")
     public ResponseEntity<String> get(@PathVariable(name = "key") String key) {
-        final String result = dataBaseService.get(key);
-        return result != null
-                ? new ResponseEntity<>(result, HttpStatus.OK)
+        final String value = dataBaseService.get(key);
+        return value != null
+                ? new ResponseEntity<>(value, HttpStatus.OK)
                 : new ResponseEntity<>("Ключа с заданным значением нет в хранилище.", HttpStatus.NOT_FOUND);
     }
 
     @DeleteMapping(value = "{key}")
     public ResponseEntity<String> remove(@PathVariable(name = "key") String key) {
-        String result = dataBaseService.remove(key);
-        return result != null
-                ? new ResponseEntity<>(result, HttpStatus.OK)
+        String value = dataBaseService.remove(key);
+        return value != null
+                ? new ResponseEntity<>(value, HttpStatus.OK)
                 : new ResponseEntity<>("Пара ключ-значение с заданным ключом не найдена.", HttpStatus.NOT_MODIFIED);
     }
 

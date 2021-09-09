@@ -11,12 +11,12 @@ public class RemoveTest {
 
     @BeforeAll
     public static void beforeClass() {
-        System.out.println("До RemoveTest класса");
+        System.out.println("До RemoveTest service класса");
     }
 
     @AfterAll
     public  static void afterClass() {
-        System.out.println("После RemoveTest класса");
+        System.out.println("После RemoveTest service класса");
     }
 
     @BeforeEach

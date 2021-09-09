@@ -21,10 +21,10 @@ public class DataBaseService {
         return DATA_BASE_MAP;
     }
 
-    private final String fileName = "data.json";
+    private final String fileName = "DataBase";
 
     public String getFileName() {
-        return fileName;
+        return fileName + ".json";
     }
 
     private static final Map<String, Double> timeMap = new ConcurrentHashMap<>();
@@ -114,7 +114,7 @@ public class DataBaseService {
      * Возвращает клиента по его ключу
      *
      * @param key ключ клиента
-     * @return объект клиента с заданным ключом
+     * @return объект клиента с заданным ключом или null, если такого объекта нет
      */
     public String get(String key) {
         return DATA_BASE_MAP.get(key);
@@ -138,7 +138,7 @@ public class DataBaseService {
      * @return true если запись удалась, иначе false
      */
     public boolean dump(String fileName) {
-        return dumpFromFile(fileName);
+        return dumpFromFile(fileName + ".json");
 
     }
 
@@ -149,7 +149,7 @@ public class DataBaseService {
      * @return true если запись удалась, иначе false
      */
     public boolean dump() {
-        return dumpFromFile(fileName);
+        return dumpFromFile(fileName + ".json");
 
     }
 
@@ -180,7 +180,7 @@ public class DataBaseService {
      * @return true если загрузка удалась, иначе false
      */
     public boolean load(String fileName) {
-        return loadFromFile(fileName);
+        return loadFromFile(fileName + ".json");
     }
 
     /**
@@ -190,7 +190,7 @@ public class DataBaseService {
      * @return true если загрузка удалась, иначе false
      */
     public boolean load() {
-        return loadFromFile(fileName);
+        return loadFromFile(fileName + ".json");
     }
 
     /**

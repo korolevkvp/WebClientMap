@@ -11,12 +11,12 @@ public class TtlTest {
 
     @BeforeAll
     public static void beforeClass() {
-        System.out.println("До TtlTest класса");
+        System.out.println("До TtlTest service класса");
     }
 
     @AfterAll
     public  static void afterClass() {
-        System.out.println("После TtlTest класса");
+        System.out.println("После TtlTest service класса");
     }
 
     @BeforeEach
@@ -41,14 +41,6 @@ public class TtlTest {
         dataBaseService.set(key, value, "1");
         Thread.sleep(500);
         Assertions.assertTrue(DataBaseService.getDataBaseMap().containsKey(key));
-    }
-
-    @DisplayName("выбрасывает NumberFormatException при вводе не численного значения ttl")
-    @Test
-    void testWrongTtl() {
-        Exception exception = Assertions.assertThrows(NumberFormatException.class, () ->
-                dataBaseService.set(key, value, "1,0"));
-        Assertions.assertEquals("For input string: \"1,0\"", exception.getMessage());
     }
 
 }

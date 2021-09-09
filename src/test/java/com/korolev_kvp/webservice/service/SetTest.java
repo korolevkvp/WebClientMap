@@ -11,12 +11,12 @@ class SetTest {
 
     @BeforeAll
     public static void beforeClass() {
-        System.out.println("До SetTest класса");
+        System.out.println("До SetTest service класса");
     }
 
     @AfterAll
     public  static void afterClass() {
-        System.out.println("После SetTest класса");
+        System.out.println("После SetTest service класса");
     }
 
     @BeforeEach
@@ -41,6 +41,12 @@ class SetTest {
         Assertions.assertTrue(DataBaseService.getDataBaseMap().containsKey(key));
     }
 
-
+    @DisplayName("выбрасывает NumberFormatException при вводе не численного значения ttl")
+    @Test
+    void testWrongArg() {
+        Exception exception = Assertions.assertThrows(NumberFormatException.class, () ->
+                dataBaseService.set(key, value, "1,0"));
+        Assertions.assertEquals("For input string: \"1,0\"", exception.getMessage());
+    }
 
 }
