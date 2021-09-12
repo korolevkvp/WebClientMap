@@ -55,7 +55,7 @@ public class DataBaseController {
                 : new ResponseEntity<>("Ключа с заданным значением нет в хранилище.", HttpStatus.NOT_FOUND);
     }
 
-    @DeleteMapping(value = "{key}")
+    @DeleteMapping(value = "/remove/{key}")
     public ResponseEntity<String> remove(@PathVariable(name = "key") String key) {
         String value = dataBaseService.remove(key);
         return value != null
