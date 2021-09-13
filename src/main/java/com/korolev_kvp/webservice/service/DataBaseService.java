@@ -40,8 +40,7 @@ public class DataBaseService {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                for (String key:
-                        timeMap.keySet()) {
+                for (String key : timeMap.keySet()) {
                     timeMap.put(key, timeMap.get(key) - 1);
                     if (timeMap.get(key) <= 0) {
                         timeMap.remove(key);
@@ -64,7 +63,7 @@ public class DataBaseService {
      * Иначе создает новые данные.
      * Время жизни записи устанавливается в 100 секунд.
      *
-     * @param key ключ для создания
+     * @param key  ключ для создания
      * @param data данные для создания
      * @return false если созданы новые данные, true если старые данные обновлены
      */
@@ -81,10 +80,10 @@ public class DataBaseService {
      *
      * @param key  - ключ для создания
      * @param data - данные для создания
-     * @param ttl - время жизни записи
+     * @param ttl  - время жизни записи
      * @return false если созданы новые данные, true если старые данные обновлены
      */
-    public boolean set(String key, String data, String ttl) throws NumberFormatException{
+    public boolean set(String key, String data, String ttl) throws NumberFormatException {
         return setElement(key, data, Double.parseDouble(ttl));
     }
 
@@ -150,7 +149,6 @@ public class DataBaseService {
      */
     public boolean dump() {
         return dumpFromFile(fileName + ".json");
-
     }
 
     /**

@@ -60,7 +60,7 @@ public class DataBaseController {
         String value = dataBaseService.remove(key);
         return value != null
                 ? new ResponseEntity<>(value, HttpStatus.OK)
-                : new ResponseEntity<>("Пара ключ-значение с заданным ключом не найдена.", HttpStatus.NOT_MODIFIED);
+                : new ResponseEntity<>("Пара ключ-значение с заданным ключом не найдена.", HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("/dump/{fileName}")
