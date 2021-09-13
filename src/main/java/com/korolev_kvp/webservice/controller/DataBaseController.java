@@ -29,7 +29,7 @@ public class DataBaseController {
     }
 
     @PostMapping("/set/{key}/{ttl}")
-    public ResponseEntity<?> set(@PathVariable(name = "key") String key, @RequestBody String data,  @PathVariable String ttl) {
+    public ResponseEntity<?> set(@PathVariable(name = "key") String key, @RequestBody String data, @PathVariable String ttl) {
         try {
             return dataBaseService.set(key, data, ttl)
                     ? new ResponseEntity<>("Старое значение заданного ключа изменено на новое.", HttpStatus.OK)

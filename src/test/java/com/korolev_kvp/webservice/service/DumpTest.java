@@ -3,6 +3,7 @@ package com.korolev_kvp.webservice.service;
 import org.junit.jupiter.api.*;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 
 public class DumpTest {
@@ -13,25 +14,29 @@ public class DumpTest {
     private final String value = "value";
 
     // для того чтобы не стереть сохранённое хранилище при тестах
-    private static Map<String, String> map;
-    private static Map<String, String> defaultMap;
+    private static Map<String, String> oldMap;
+
+    private static String fileName;
 
     @BeforeAll
     public static void beforeClass() {
         System.out.println("До DumpTest service класса");
         dataBaseService = new DataBaseService();
-        if (new File("file").isFile())
-            if (dataBaseService.load("file")) map = DataBaseService.getDataBaseMap();
-
-        if (new File(dataBaseService.getFileName()).isFile())
-            if (dataBaseService.load()) defaultMap = DataBaseService.getDataBaseMap();
+        fileName = dataBaseService.getFileName();
+        if (new File(fileName).isFile())
+            if (dataBaseService.load()) oldMap = DataBaseService.getDataBaseMap();
+        DataBaseService.setDataBaseMap(new HashMap<>());
     }
 
     @AfterAll
     public  static void afterClass() {
+        dataBaseService = new DataBaseService();
         System.out.println("После DumpTest service класса");
-        if (map != null) dataBaseService.load("file");
-        if (defaultMap != null) dataBaseService.load();
+        if (oldMap != null) {
+            DataBaseService.setDataBaseMap(oldMap);
+            dataBaseService.dump();
+        }
+        else new File(fileName).delete();
     }
 
     @BeforeEach
@@ -48,16 +53,15 @@ public class DumpTest {
     @Test
     void testDefaultDump() {
         Assertions.assertTrue(dataBaseService.dump());
-        File file = new File(dataBaseService.getFileName());
+        File file = new File(fileName);
         Assertions.assertTrue(file.isFile());
         Assertions.assertTrue(file.delete());
     }
 
     @Test
     void testDump() {
-        String filename = "file";
-        dataBaseService.dump(filename);
-        File file = new File(filename);
+        dataBaseService.dump(fileName);
+        File file = new File(fileName + ".json");
         Assertions.assertTrue(file.exists());
         Assertions.assertTrue(file.isFile());
         Assertions.assertTrue(file.delete());

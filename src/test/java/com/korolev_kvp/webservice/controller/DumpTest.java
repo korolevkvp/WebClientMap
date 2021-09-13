@@ -17,25 +17,26 @@ public class DumpTest {
     private final String value = "value";
 
     // для того чтобы не стереть сохранённое хранилище при тестах
-    private static Map<String, String> map;
-    private static Map<String, String> defaultMap;
+    private static Map<String, String> oldMap;
+
+    private static String fileName;
 
     @BeforeAll
     public static void beforeClass() {
         System.out.println("До DumpTest controller класса");
         dataBaseService = new DataBaseService();
-        if (new File("file").isFile())
-            if (dataBaseService.load("file")) map = DataBaseService.getDataBaseMap();
-        if (new File(dataBaseService.getFileName()).isFile())
-            if (dataBaseService.load()) defaultMap = DataBaseService.getDataBaseMap();
+        dataBaseController = new DataBaseController(dataBaseService);
+        fileName = dataBaseService.getFileName();
+        if (new File(fileName).isFile())
+            if (dataBaseService.load()) oldMap = DataBaseService.getDataBaseMap();
     }
 
     @AfterAll
     public  static void afterClass() {
         System.out.println("После DumpTest controller класса");
         dataBaseService = new DataBaseService();
-        if (map != null) dataBaseService.load("file");
-        if (defaultMap != null) dataBaseService.load();
+        if (oldMap != null) dataBaseService.load();
+        else new File(fileName).delete();
     }
 
     @BeforeEach
@@ -61,9 +62,8 @@ public class DumpTest {
 
     @Test
     void testDump() {
-        String filename = "file";
-        dataBaseController.dump(filename);
-        File file = new File(filename + ".json");
+        dataBaseController.dump(fileName);
+        File file = new File(fileName + ".json");
         Assertions.assertTrue(file.exists());
         Assertions.assertTrue(file.isFile());
         Assertions.assertTrue(file.delete());

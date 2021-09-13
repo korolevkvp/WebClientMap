@@ -21,6 +21,10 @@ public class DataBaseService {
         return DATA_BASE_MAP;
     }
 
+    public static void setDataBaseMap(Map<String, String> dataBaseMap) {
+        DATA_BASE_MAP = dataBaseMap;
+    }
+
     private final String fileName = "DataBase";
 
     public String getFileName() {

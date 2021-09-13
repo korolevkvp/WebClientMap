@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 
 public class LoadTest {
@@ -17,31 +18,27 @@ public class LoadTest {
     private static final String value = "value";
 
     // для того чтобы не стереть сохранённое хранилище при тестах
-    private static Map<String, String> map;
-    private static Map<String, String> defaultMap;
+    private static Map<String, String> oldMap;
 
-    private static final String fileName = "file";
+    private static String fileName;
 
     @BeforeAll
     static void beforeClass() {
         System.out.println("До LoadTest controller класса");
         dataBaseService = new DataBaseService();
-        if (new File(fileName).isFile())
-            if (dataBaseService.load(fileName)) map = DataBaseService.getDataBaseMap();
-        if (new File(dataBaseService.getFileName()).isFile())
-            if (dataBaseService.load()) defaultMap = DataBaseService.getDataBaseMap();
         dataBaseController = new DataBaseController(dataBaseService);
-        dataBaseController.set(key, value);
-        dataBaseController.dump();
-        dataBaseController.dump(fileName);
+        fileName = dataBaseService.getFileName();
+        if (new File(fileName).isFile())
+            if (dataBaseService.load()) oldMap = DataBaseService.getDataBaseMap();
+        DataBaseService.setDataBaseMap(new HashMap<>() {{put(key, value);}});
     }
 
     @AfterAll
     static void afterClass() {
         System.out.println("После LoadTest controller класса");
         dataBaseService = new DataBaseService();
-        if (map != null) dataBaseService.load(fileName);
-        if (defaultMap != null) dataBaseService.load();
+        if (oldMap != null) dataBaseService.load();
+        else new File(fileName).delete();
     }
 
     @BeforeEach

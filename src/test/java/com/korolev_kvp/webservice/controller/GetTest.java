@@ -55,6 +55,7 @@ class GetTest {
 
     @Test
     void testEmptyGetAll() {
+        dataBaseController.remove(key);
         Assertions.assertEquals(new ResponseEntity<>("Хранилище пустое.", HttpStatus.NOT_FOUND), dataBaseController.getAll());
     }
 }

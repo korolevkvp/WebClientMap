@@ -45,6 +45,6 @@ public class RemoveTest {
 
     @Test
     void testWrongRemove() {
-        Assertions.assertEquals(new ResponseEntity<>("Пара ключ-значение с заданным ключом не найдена.", HttpStatus.NOT_MODIFIED), dataBaseController.remove(""));
+        Assertions.assertEquals(new ResponseEntity<>("Пара ключ-значение с заданным ключом не найдена.", HttpStatus.NOT_FOUND), dataBaseController.remove(""));
     }
 }
