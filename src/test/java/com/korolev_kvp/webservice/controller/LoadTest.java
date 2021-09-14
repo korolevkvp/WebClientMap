@@ -18,27 +18,50 @@ public class LoadTest {
     private static final String value = "value";
 
     // для того чтобы не стереть сохранённое хранилище при тестах
-    private static Map<String, String> oldMap;
+    private static Map<String, String> map;
+    private static Map<String, String> defaultMap;
 
-    private static String fileName;
+    private static final String fileName = "Test";
 
     @BeforeAll
     static void beforeClass() {
         System.out.println("До LoadTest controller класса");
         dataBaseService = new DataBaseService();
         dataBaseController = new DataBaseController(dataBaseService);
-        fileName = dataBaseService.getFileName();
         if (new File(fileName).isFile())
-            if (dataBaseService.load()) oldMap = DataBaseService.getDataBaseMap();
+            if (dataBaseService.load(fileName)) map = DataBaseService.getDataBaseMap();
+        if (new File(dataBaseService.getFileName()).isFile())
+            if (dataBaseService.load()) defaultMap = DataBaseService.getDataBaseMap();
         DataBaseService.setDataBaseMap(new HashMap<>() {{put(key, value);}});
+        dataBaseService.dump(fileName);
+        dataBaseService.dump();
     }
 
     @AfterAll
     static void afterClass() {
         System.out.println("После LoadTest controller класса");
         dataBaseService = new DataBaseService();
-        if (oldMap != null) dataBaseService.load();
-        else new File(fileName).delete();
+        if (map != null) {
+            DataBaseService.setDataBaseMap(map);
+            dataBaseService.dump(fileName);
+            System.out.println("dump test");
+
+        }
+        else {
+            System.out.println("del test");
+            new File(fileName + ".json").delete();
+        }
+        if (defaultMap != null) {
+            DataBaseService.setDataBaseMap(defaultMap);
+            dataBaseService.dump(dataBaseService.getFileName());
+            System.out.println("dump def");
+
+        }
+        else {
+            System.out.println("delete def");
+            new File(dataBaseService.getFileName()).delete();
+        }
+
     }
 
     @BeforeEach
