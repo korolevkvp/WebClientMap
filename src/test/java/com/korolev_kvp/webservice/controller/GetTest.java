@@ -1,6 +1,7 @@
 package com.korolev_kvp.webservice.controller;
 
 import com.korolev_kvp.webservice.service.DataBaseService;
+import com.korolev_kvp.webservice.util.JSONConverter;
 import org.junit.jupiter.api.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,7 +51,7 @@ class GetTest {
 
     @Test
     void testGetAll() {
-        Assertions.assertEquals(new ResponseEntity<>(dataBaseService.mapToString(new HashMap<>() {{put(key, value);}}), HttpStatus.OK), dataBaseController.getAll());
+        Assertions.assertEquals(new ResponseEntity<>(JSONConverter.mapToJSONString(new HashMap<>() {{put(key, value);}}), HttpStatus.OK), dataBaseController.getAll());
     }
 
     @Test

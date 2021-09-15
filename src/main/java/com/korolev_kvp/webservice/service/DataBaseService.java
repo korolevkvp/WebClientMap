@@ -1,12 +1,11 @@
 package com.korolev_kvp.webservice.service;
 
+import com.korolev_kvp.webservice.util.CSVReader;
 import org.springframework.stereotype.Service;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,13 +24,13 @@ public class DataBaseService {
         DATA_BASE_MAP = dataBaseMap;
     }
 
-    private final String fileName = "DataBase";
+    private final String fileName = "DataBase.csv";
 
     public String getFileName() {
-        return fileName + ".json";
+        return fileName;
     }
 
-    private static final Map<String, Double> timeMap = new ConcurrentHashMap<>();
+    private static Map<String, Double> timeMap = new ConcurrentHashMap<>();
 
     private static final Thread timeThread;
 
@@ -130,6 +129,7 @@ public class DataBaseService {
      * @return бывшее значение этого ключа, или null, если пара ключ-значение не найдена
      */
     public String remove(String key) {
+        timeMap.remove(key);
         return DATA_BASE_MAP.remove(key);
     }
 
@@ -141,7 +141,7 @@ public class DataBaseService {
      * @return true если запись удалась, иначе false
      */
     public boolean dump(String fileName) {
-        return dumpFromFile(fileName + ".json");
+        return dumpToFile(fileName);
 
     }
 
@@ -152,7 +152,7 @@ public class DataBaseService {
      * @return true если запись удалась, иначе false
      */
     public boolean dump() {
-        return dumpFromFile(fileName + ".json");
+        return dumpToFile(fileName);
     }
 
     /**
@@ -162,10 +162,9 @@ public class DataBaseService {
      *
      * @return true если запись удалась, иначе false
      */
-    private boolean dumpFromFile(String fileName) {
+    private boolean dumpToFile(String fileName) {
         try (OutputStream outputStream = new FileOutputStream(fileName)) {
-            final Map<String, String> dataList = getAll();
-            byte[] dataToBytes = mapToString(dataList).getBytes();
+            byte[] dataToBytes = dumpDBToCSV().getBytes();
             outputStream.write(dataToBytes);
             return true;
         } catch (IOException e) {
@@ -182,7 +181,7 @@ public class DataBaseService {
      * @return true если загрузка удалась, иначе false
      */
     public boolean load(String fileName) {
-        return loadFromFile(fileName + ".json");
+        return loadFromFile(fileName);
     }
 
     /**
@@ -192,24 +191,18 @@ public class DataBaseService {
      * @return true если загрузка удалась, иначе false
      */
     public boolean load() {
-        return loadFromFile(fileName + ".json");
+        return loadFromFile(fileName);
     }
 
     /**
      * Вспомогательный метод для преобразования для
      * загрузки текущее состояние хранилища из файла.
-     * Время жизни устанавливается по умолчанию - 100 секунд.
      *
      * @return true если загрузка удалась, иначе false
      */
     private boolean loadFromFile(String fileName) {
         try {
-            String content = Files.lines(Paths.get(fileName)).reduce("", String::concat);
-            DATA_BASE_MAP = stringToMap(content);
-            for (String key :
-                    DATA_BASE_MAP.keySet()) {
-                timeMap.put(key, 100.);
-            }
+            loadDBFromCSV(CSVReader.fileToCSV(fileName));
             return true;
         } catch (Exception e) {
             System.out.println("Ошибка при загрузке хранилища из файла.");
@@ -219,52 +212,36 @@ public class DataBaseService {
 
     /**
      * Вспомогательный метод для преобразования
-     * Map в String в формате JSON
+     * хранилища в строку в формате CSV
      *
-     * @param map объект типа Map<String, String>
-     * @return получаемая строка с парами ключ-значение в формате JSON
+     * @return получаемая строка с парами ключ-значение в формате CSV
      */
-    public String mapToString(Map<String, String> map) {
-        StringBuilder result = new StringBuilder("{");
-        for (String key : map.keySet()) {
-            result.append("\n    \"").append(key).append("\": \"").append(map.get(key)).append("\",");
+    private String dumpDBToCSV() {
+        StringBuilder result = new StringBuilder();
+        for (String key : DATA_BASE_MAP.keySet()) {
+            result.append(key).append(",").append(DATA_BASE_MAP.get(key)).append(",").append(timeMap.get(key)).append("\n");
         }
-        int last = result.lastIndexOf(",");
-        if (last != -1) result.delete(last, last + 1);
-        result.append("\n}");
         return new String(result);
     }
 
     /**
      * Вспомогательный метод для преобразования
-     * String в формате JSON в map
+     * строки в формате CSV в хранилище
      *
-     * @param str строка с парами ключ-значение в формате JSON
-     * @return полученный объект типа Map<String, String> (null при ошибке)
+     * @param str строка с парами ключ-значение в формате CSV
      */
-    public Map<String, String> stringToMap(String str) {
-        HashMap<String, String> map = new HashMap<>();
-        while (!str.equals("")) {
-            int startChar = str.indexOf("\"") + 1;
-            int endChar = startChar;
-            char currentChar = 'x';
-            while (currentChar != '"') {
-                currentChar = str.charAt(endChar);
-                endChar += 1;
-            }
-            String key = str.substring(startChar, endChar - 1);
-            startChar = endChar + 3;
-            endChar = startChar;
-            currentChar = 'x';
-            while (currentChar != '"') {
-                currentChar = str.charAt(endChar);
-                endChar += 1;
-            }
-            String value = str.substring(startChar, endChar - 1);
-            map.put(key, value);
-            str = str.substring(endChar + 1);
+    private void loadDBFromCSV(String str) {
+        Map<String, String> db = new HashMap<>();
+        Map<String, Double> timMap = new HashMap<>();
+        String[] lines = str.split("\r\n|\n|\r");
+        for (String line :
+                lines) {
+            String[] elements = line.split(",");
+            db.put(elements[0], elements[1]);
+            timMap.put(elements[0], Double.parseDouble(elements[2]));
         }
-        return map;
+        DATA_BASE_MAP = db;
+        timeMap = timMap;
     }
 
 }

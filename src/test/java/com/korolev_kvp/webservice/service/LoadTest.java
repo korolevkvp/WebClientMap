@@ -14,29 +14,42 @@ public class LoadTest {
     private static final String value = "value";
 
     // для того чтобы не стереть сохранённое хранилище при тестах
-    private static Map<String, String> oldMap;
+    private static Map<String, String> map;
+    private static Map<String, String> defaultMap;
 
-    private static String fileName;
+    private static final String fileName = "Test";
 
     @BeforeAll
     static void beforeClass() {
         System.out.println("До LoadTest service класса");
         dataBaseService = new DataBaseService();
-        fileName = dataBaseService.getFileName();
         if (new File(fileName).isFile())
-            if (dataBaseService.load()) oldMap = DataBaseService.getDataBaseMap();
-        DataBaseService.setDataBaseMap(new HashMap<>() {{put(key, value);}});
+            if (dataBaseService.load(fileName)) map = DataBaseService.getDataBaseMap();
+        if (new File(dataBaseService.getFileName()).isFile())
+            if (dataBaseService.load()) defaultMap = DataBaseService.getDataBaseMap();
+        DataBaseService.setDataBaseMap(new HashMap<>() {{
+            put(key, value);
+        }});
+        dataBaseService.dump(fileName);
+        dataBaseService.dump();
     }
 
     @AfterAll
     static void afterClass() {
         System.out.println("После LoadTest service класса");
         dataBaseService = new DataBaseService();
-        if (oldMap != null) {
-            DataBaseService.setDataBaseMap(oldMap);
-            dataBaseService.dump();
+        if (map != null) {
+            DataBaseService.setDataBaseMap(map);
+            dataBaseService.dump(fileName);
+        } else {
+            new File(fileName).delete();
         }
-        else new File(fileName).delete();
+        if (defaultMap != null) {
+            DataBaseService.setDataBaseMap(defaultMap);
+            dataBaseService.dump(dataBaseService.getFileName());
+        } else {
+            new File(dataBaseService.getFileName()).delete();
+        }
     }
 
     @BeforeEach

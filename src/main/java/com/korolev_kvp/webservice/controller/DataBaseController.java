@@ -1,6 +1,7 @@
 package com.korolev_kvp.webservice.controller;
 
 import com.korolev_kvp.webservice.service.DataBaseService;
+import com.korolev_kvp.webservice.util.JSONConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +44,7 @@ public class DataBaseController {
     public ResponseEntity<String> getAll() {
         final Map<String, String> dataList = dataBaseService.getAll();
         return dataList != null && !dataList.isEmpty()
-                ? new ResponseEntity<>(dataBaseService.mapToString(dataList), HttpStatus.OK)
+                ? new ResponseEntity<>(JSONConverter.mapToJSONString(dataList), HttpStatus.OK)
                 : new ResponseEntity<>("Хранилище пустое.", HttpStatus.NOT_FOUND);
     }
 
@@ -91,4 +92,9 @@ public class DataBaseController {
                 : new ResponseEntity<>("Произошла ошибка. Хранилище не загружено из файла.", HttpStatus.NOT_FOUND);
     }
 
+    @DeleteMapping("/exit")
+    public void exit() {
+        System.out.println("Завершение работы...");
+        System.exit(0);
+    }
 }

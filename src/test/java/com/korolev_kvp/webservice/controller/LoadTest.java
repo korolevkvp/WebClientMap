@@ -32,7 +32,9 @@ public class LoadTest {
             if (dataBaseService.load(fileName)) map = DataBaseService.getDataBaseMap();
         if (new File(dataBaseService.getFileName()).isFile())
             if (dataBaseService.load()) defaultMap = DataBaseService.getDataBaseMap();
-        DataBaseService.setDataBaseMap(new HashMap<>() {{put(key, value);}});
+        DataBaseService.setDataBaseMap(new HashMap<>() {{
+            put(key, value);
+        }});
         dataBaseService.dump(fileName);
         dataBaseService.dump();
     }
@@ -44,21 +46,13 @@ public class LoadTest {
         if (map != null) {
             DataBaseService.setDataBaseMap(map);
             dataBaseService.dump(fileName);
-            System.out.println("dump test");
-
-        }
-        else {
-            System.out.println("del test");
-            new File(fileName + ".json").delete();
+        } else {
+            new File(fileName).delete();
         }
         if (defaultMap != null) {
             DataBaseService.setDataBaseMap(defaultMap);
             dataBaseService.dump(dataBaseService.getFileName());
-            System.out.println("dump def");
-
-        }
-        else {
-            System.out.println("delete def");
+        } else {
             new File(dataBaseService.getFileName()).delete();
         }
 

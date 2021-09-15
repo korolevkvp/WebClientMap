@@ -38,14 +38,14 @@ public class TtlTest {
     @Test
     void testTtlAfter() throws InterruptedException {
         dataBaseController.set(key, value, "1");
-        Thread.sleep(1000);
+        Thread.sleep(1100);
         Assertions.assertEquals(new ResponseEntity<>("Ключа с заданным значением нет в хранилище.", HttpStatus.NOT_FOUND), dataBaseController.get(key));
     }
 
     @Test
     void testTtlBefore() throws InterruptedException {
         dataBaseController.set(key, value, "1");
-        Thread.sleep(500);
+        Thread.sleep(100);
         Assertions.assertEquals(new ResponseEntity<>(value, HttpStatus.OK), dataBaseController.get(key));
     }
 
