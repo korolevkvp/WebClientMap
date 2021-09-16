@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
+/**
+ * Класс, описывающий чтение файлов в формате CSV.
+ */
 public class CSVReader {
 
     /**

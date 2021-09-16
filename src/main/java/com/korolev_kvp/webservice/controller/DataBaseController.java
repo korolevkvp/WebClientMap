@@ -136,7 +136,7 @@ public class DataBaseController {
 
     /**
      * Метод для загрузки хранилища из определённого файла
-     * @param fileName
+     * @param fileName имя файла
      * @return сообщение об успешной или неуспешной загрузке
      */
     @PostMapping("/load/{fileName}")

@@ -3,13 +3,17 @@ package com.korolev_kvp.webservice.util;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Класс, описывающий преобразования
+ * между строкой в JSON формате и структурой Map
+ */
 public class JSONConverter {
 
     /**
      * Вспомогательный метод для преобразования
      * Map в String в формате JSON
      *
-     * @param map объект типа Map<String, String>
+     * @param map преобразуемая структура Map
      * @return получаемая строка с парами ключ-значение в формате JSON
      */
     public static String mapToJSONString(Map<String, String> map) {
@@ -28,7 +32,7 @@ public class JSONConverter {
      * String в формате JSON в map
      *
      * @param str строка с парами ключ-значение в формате JSON
-     * @return полученный объект типа Map<String, String> (null при ошибке)
+     * @return полученный структура Map (null при ошибке)
      */
     public static Map<String, String> JSONStringToMap(String str) {
         HashMap<String, String> map = new HashMap<>();
