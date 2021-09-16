@@ -10,18 +10,32 @@ import org.springframework.web.bind.annotation.*;
 import java.io.File;
 import java.util.Map;
 
+/**
+ * Класс, описывающий контроллер.
+ * Тут описана логика работы с запросами извне и их отправка сервису.
+ */
 @RestController
 @RequestMapping
 public class DataBaseController {
 
     private static DataBaseService dataBaseService;
 
+    /**
+     * Конструктор, устанавливающий связь с сервисом.
+     * @param dataBaseService связанный с контроллером сервис
+     */
     @Autowired
     public DataBaseController(DataBaseService dataBaseService) {
         DataBaseController.dataBaseService = dataBaseService;
     }
 
 
+    /**
+     * Метод для обработки установки значения по ключу и временем жизни по умолчанию
+     * @param key ключ
+     * @param data значение
+     * @return ответ клиенту о создании или замене пары ключ-значение
+     */
     @PostMapping("/set/{key}")
     public ResponseEntity<?> set(@PathVariable(name = "key") String key, @RequestBody String data) {
         return dataBaseService.set(key, data)
@@ -29,6 +43,14 @@ public class DataBaseController {
                 : new ResponseEntity<>("Добавлена новая пара ключ-значение.", HttpStatus.CREATED);
     }
 
+    /**
+     *
+     * Тот же set, но с определённым временем жизни
+     * @param key ключ
+     * @param data значение
+     * @param ttl время жизни
+     * @return ответ клиенту о создании или замене пары ключ-значение, либо ошибка
+     */
     @PostMapping("/set/{key}/{ttl}")
     public ResponseEntity<?> set(@PathVariable(name = "key") String key, @RequestBody String data, @PathVariable String ttl) {
         try {
@@ -40,6 +62,10 @@ public class DataBaseController {
         }
     }
 
+    /**
+     * Метод для команды, которая возвращает всё хранилище.
+     * @return всё хранилище или сообщение о том, что оно пустое
+     */
     @GetMapping("/get")
     public ResponseEntity<String> getAll() {
         final Map<String, String> dataList = dataBaseService.getAll();
@@ -48,6 +74,11 @@ public class DataBaseController {
                 : new ResponseEntity<>("Хранилище пустое.", HttpStatus.NOT_FOUND);
     }
 
+    /**
+     * Метод для получения значения по ключу
+     * @param key ключ
+     * @return значение или сообщение о том, что заданного ключа не существует
+     */
     @GetMapping(value = "/get/{key}")
     public ResponseEntity<String> get(@PathVariable(name = "key") String key) {
         final String value = dataBaseService.get(key);
@@ -56,6 +87,11 @@ public class DataBaseController {
                 : new ResponseEntity<>("Ключа с заданным значением нет в хранилище.", HttpStatus.NOT_FOUND);
     }
 
+    /**
+     * Метод для удаления значения по ключу
+     * @param key ключ
+     * @return удалённое значение или сообщение о том, что заданного ключа не существует
+     */
     @DeleteMapping(value = "/remove/{key}")
     public ResponseEntity<String> remove(@PathVariable(name = "key") String key) {
         String value = dataBaseService.remove(key);
@@ -64,13 +100,10 @@ public class DataBaseController {
                 : new ResponseEntity<>("Пара ключ-значение с заданным ключом не найдена.", HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping("/dump/{fileName}")
-    public ResponseEntity<?> dump(@PathVariable String fileName) {
-        return dataBaseService.dump(fileName)
-                ? new ResponseEntity<>(new File(fileName), HttpStatus.CREATED)
-                : new ResponseEntity<>("Произошла ошибка. Хранилище не записано в файл.", HttpStatus.NOT_FOUND);
-    }
-
+    /**
+     * Метод для сохранения хранилища в файл по умолчанию
+     * @return записанный файл или сообщение об ошибке
+     */
     @GetMapping("/dump")
     public ResponseEntity<?> dump() {
         return dataBaseService.dump()
@@ -78,13 +111,22 @@ public class DataBaseController {
                 : new ResponseEntity<>("Произошла ошибка. Хранилище не записано в файл.", HttpStatus.NOT_FOUND);
     }
 
-    @PostMapping("/load/{fileName}")
-    public ResponseEntity<?> load(@PathVariable String fileName) {
-        return dataBaseService.load(fileName)
-                ? new ResponseEntity<>("Хранилище загружено из файла: " + new File(fileName), HttpStatus.OK)
-                : new ResponseEntity<>("Произошла ошибка. Хранилище не загружено из файла.", HttpStatus.NOT_FOUND);
+    /**
+     * Метод для сохранения хранилища в определённый файл
+     * @param fileName имя файла
+     * @return записанный файл или сообщение об ошибке
+     */
+    @GetMapping("/dump/{fileName}")
+    public ResponseEntity<?> dump(@PathVariable String fileName) {
+        return dataBaseService.dump(fileName)
+                ? new ResponseEntity<>(new File(fileName), HttpStatus.CREATED)
+                : new ResponseEntity<>("Произошла ошибка. Хранилище не записано в файл.", HttpStatus.NOT_FOUND);
     }
 
+    /**
+     * Метод для загрузки хранилища из файла по умолчанию
+     * @return сообщение об успешной или неуспешной загрузке
+     */
     @PostMapping("/load")
     public ResponseEntity<?> load() {
         return dataBaseService.load()
@@ -92,6 +134,21 @@ public class DataBaseController {
                 : new ResponseEntity<>("Произошла ошибка. Хранилище не загружено из файла.", HttpStatus.NOT_FOUND);
     }
 
+    /**
+     * Метод для загрузки хранилища из определённого файла
+     * @param fileName
+     * @return сообщение об успешной или неуспешной загрузке
+     */
+    @PostMapping("/load/{fileName}")
+    public ResponseEntity<?> load(@PathVariable String fileName) {
+        return dataBaseService.load(fileName)
+                ? new ResponseEntity<>("Хранилище загружено из файла: " + new File(fileName), HttpStatus.OK)
+                : new ResponseEntity<>("Произошла ошибка. Хранилище не загружено из файла.", HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * Метод для завершения работы
+     */
     @DeleteMapping("/exit")
     public void exit() {
         System.out.println("Завершение работы...");

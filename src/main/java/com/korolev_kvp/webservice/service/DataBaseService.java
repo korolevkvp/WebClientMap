@@ -10,6 +10,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Класс, описывающий работу сервиса.
+ * В нём находится хранилище и методы для его изменения.
+ */
 @Service
 public class DataBaseService {
 
