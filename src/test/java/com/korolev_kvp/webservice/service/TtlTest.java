@@ -32,7 +32,7 @@ public class TtlTest {
     @Test
     void testTtlAfter() throws InterruptedException {
         dataBaseService.set(key, value, "1");
-        Thread.sleep(1100);
+        Thread.sleep(2000);
         Assertions.assertFalse(DataBaseService.getDataBaseMap().containsKey(key));
     }
 
