@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,12 +44,12 @@ public class DataBaseService {
         timeThread = new Thread(() -> {
             while (true) {
                 try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
+                    Thread.sleep(100);
+                } catch (InterruptedException | ConcurrentModificationException e) {
                     e.printStackTrace();
                 }
                 for (String key : timeMap.keySet()) {
-                    timeMap.put(key, timeMap.get(key) - 1);
+                    timeMap.put(key, timeMap.get(key) - 0.1);
                     if (timeMap.get(key) <= 0) {
                         timeMap.remove(key);
                         DATA_BASE_MAP.remove(key);
