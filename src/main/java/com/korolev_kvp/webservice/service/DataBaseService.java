@@ -45,18 +45,17 @@ public class DataBaseService {
             while (true) {
                 try {
                     Thread.sleep(100);
-                } catch (InterruptedException | ConcurrentModificationException e) {
-                    e.printStackTrace();
-                }
-                for (String key : timeMap.keySet()) {
-                    timeMap.put(key, timeMap.get(key) - 0.1);
-                    if (timeMap.get(key) <= 0) {
-                        timeMap.remove(key);
-                        DATA_BASE_MAP.remove(key);
-                        System.out.println("Данные по ключу \"" + key + "\" удалены из таблицы.");
-
+                } catch (InterruptedException | ConcurrentModificationException ignored) {}
+                try {
+                    for (String key : timeMap.keySet()) {
+                        timeMap.put(key, timeMap.get(key) - 0.1);
+                        if (timeMap.get(key) <= 0) {
+                            timeMap.remove(key);
+                            DATA_BASE_MAP.remove(key);
+                            System.out.println("Данные по ключу \"" + key + "\" удалены из таблицы.");
+                        }
                     }
-                }
+                } catch (ConcurrentModificationException ignored) {}
 
             }
         });
